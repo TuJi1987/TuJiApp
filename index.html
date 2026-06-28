@@ -419,15 +419,18 @@
   <script>
 
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
+      // 先註冊 SW
       navigator.serviceWorker.register('/sw.js').then(reg => {
         console.log('✅ SW 註冊成功', reg);
+      }).catch(err => console.error('❌ SW 註冊失敗', err));
+
+      // 等 service worker 就緒後再檢查是否有 controller，若沒有則重新載入以讓 SW 接管
+      navigator.serviceWorker.ready.then(() => {
         if (!navigator.serviceWorker.controller) {
-          // 如果目前頁面尚未被 service worker 控制，重新載入以讓新 SW 接管
+          console.log('🔁 強制重新載入讓 SW 接管');
           location.reload();
         }
-      }).catch(err => console.error('❌ SW 註冊失敗', err));
-    });
+      });
   }
 
   </script>
