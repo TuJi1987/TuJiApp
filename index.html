@@ -7,31 +7,14 @@
   <title>塗記嫩仙草：計算機</title>
   
   <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#e95f13">
-  
+
   <!-- iOS 支援 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="塗記計算機">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <!doctype html>
-  <html lang="zh-Hant">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  
-    <title>塗記嫩仙草：計算機</title>
-  
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#e95f13">
-  
-    <!-- iOS 支援 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="塗記計算機">
-    <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="/icon-192.png">
     <style>
       #avgDetails,
       #profitDetails {
@@ -437,7 +420,7 @@
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').then(reg => {
+      navigator.serviceWorker.register('/sw.js').then(reg => {
         console.log('✅ SW 註冊成功', reg);
         if (!navigator.serviceWorker.controller) {
           // 如果目前頁面尚未被 service worker 控制，重新載入以讓新 SW 接管
