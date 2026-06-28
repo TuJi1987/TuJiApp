@@ -327,6 +327,7 @@
             <div class="subline">塗記計算機</div>
           </div>
           <div class="top-actions">
+            <button class="small-btn good" type="button" id="installAppBtn" hidden>安裝 App</button>
             <button class="small-btn" type="button" id="openSettingsTop">設　　定</button>
             <button class="small-btn" type="button" id="openRecordsTop">訂單記錄</button>
           </div>
@@ -438,6 +439,7 @@
   <script>
   const STORAGE_KEY = "tuji-pos-calculator-v0";
   const RECORD_KEY = "tuji-pos-calculator-records-v0";
+  let deferredInstallPrompt = null;
 
   const DEFAULT_PRODUCTS = [
     { name: "純豆花", price: 40, eq: 1, cost: 0, buy: 0, image: "" },
@@ -499,6 +501,21 @@
       }
       function loadRecords() {
         try { const arr = JSON.parse(localStorage.getItem(RECORD_KEY) || "[]"); return Array.isArray(arr) ? arr : []; } catch (_) { return []; }
+      }
+
+      function isIosDevice() {
+        return /iphone|ipad|ipod/i.test(navigator.userAgent);
+      }
+
+      function isInStandaloneMode() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+      }
+
+      function updateInstallButton() {
+        const btn = $("installAppBtn");
+        if (!btn) return;
+        const shouldShow = !isInStandaloneMode() && (Boolean(deferredInstallPrompt) || isIosDevice());
+        btn.hidden = !shouldShow;
       }
     
       let state = loadState();
@@ -692,8 +709,35 @@
       $("openSettingsTop").addEventListener("click", () => openModal("settingsBackdrop"));
       $("openRecords").addEventListener("click", () => openModal("recordsBackdrop"));
       $("openRecordsTop").addEventListener("click", () => openModal("recordsBackdrop"));
+      $("installAppBtn").addEventListener("click", async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          await deferredInstallPrompt.userChoice.catch(() => null);
+          deferredInstallPrompt = null;
+          updateInstallButton();
+          return;
+        }
+
+        if (isIosDevice()) {
+          alert("iPhone / iPad 不會自動跳出安裝視窗。請在 Safari 點下方或上方的『分享』，再選『加入主畫面』。");
+          return;
+        }
+
+        alert("目前這個瀏覽器沒有提供安裝提示。若你使用 Android Chrome，可先點右上角選單，尋找『安裝應用程式』或『加入主畫面』。");
+      });
       document.querySelectorAll("[data-close]").forEach(btn => btn.addEventListener("click", () => closeModal(btn.dataset.close)));
       document.addEventListener("keydown", e => { if (e.key === "Escape") { closeModal("settingsBackdrop"); closeModal("recordsBackdrop"); } });
+
+      window.addEventListener("beforeinstallprompt", event => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        updateInstallButton();
+      });
+
+      window.addEventListener("appinstalled", () => {
+        deferredInstallPrompt = null;
+        updateInstallButton();
+      });
 
       function adjustQtyButton(btn) {
         const act = btn.dataset.act;
@@ -851,7 +895,8 @@
         renderRecords();
       });
 
-      render();
+        render();
+        updateInstallButton();
   </script>
 
   </body>
