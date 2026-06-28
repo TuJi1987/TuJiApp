@@ -437,9 +437,13 @@
 
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('✅ SW 註冊成功', reg))
-        .catch(err => console.error('❌ SW 註冊失敗', err));
+      navigator.serviceWorker.register('./sw.js').then(reg => {
+        console.log('✅ SW 註冊成功', reg);
+        if (!navigator.serviceWorker.controller) {
+          // 如果目前頁面尚未被 service worker 控制，重新載入以讓新 SW 接管
+          location.reload();
+        }
+      }).catch(err => console.error('❌ SW 註冊失敗', err));
     });
   }
 
